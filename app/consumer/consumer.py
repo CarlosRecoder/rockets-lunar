@@ -23,8 +23,8 @@ kafka_bootstrap_servers = 'kafka:9092'
 kafka_topic = 'rocket_messages'
 consumer_group_id = 'mongo_consumer'
 try:
-    consumer = KafkaConsumer(kafka_topic, 
-                            bootstrap_servers=kafka_bootstrap_servers, 
+    consumer = KafkaConsumer(kafka_topic,
+                            bootstrap_servers=kafka_bootstrap_servers,
                             api_version=(3,4,0),
                             group_id=consumer_group_id)
 except KafkaError:
@@ -49,7 +49,7 @@ def process_message(message):
         # Deserialize the message from JSON to a Python object
         rocket_message = loads(decoded_message)
 
-    except (UnicodeDecodeError, ValueError) as e:
+    except (UnicodeDecodeError, ValueError):
         logger.exception('Error decoding or deserializing message:')
         return
     
@@ -108,3 +108,4 @@ def process_message(message):
 # Consume messages
 for message in consumer:
     process_message(message)
+
