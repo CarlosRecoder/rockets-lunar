@@ -99,7 +99,7 @@ The system has been designed keeping scalability in mind. Kafka and MongoDB, the
 
 1. **Producer Application:** Currently, the producer application (`producer.py`) is designed to run on a single machine and push messages to Kafka. As data volume grows, this single application may become a bottleneck. This can be resolved by creating multiple instances of the producer application running in parallel, each pushing a portion of the data.
 
-2. **Consumer Application:** The consumer application is also designed to run on a single machine. If the data inflow increases beyond its processing capacity, this can cause a backlog of messages in Kafka. Implementing horizontal scaling strategies, such as running multiple instances of the consumer application, would help address this issue. Load balancing strategies could be introduced to distribute the data evenly among multiple consumer instances.
+2. **Consumer Application:** The consumer application (`consumer.py`) is also designed to run on a single machine. If the data inflow increases beyond its processing capacity, this can cause a backlog of messages in Kafka. Implementing horizontal scaling strategies, such as running multiple instances of the consumer application, would help address this issue. Load balancing strategies could be introduced to distribute the data evenly among multiple consumer instances.
 
 3. **MongoDB:** While MongoDB supports horizontal scaling via sharding, the system currently does not implement sharding. As the data grows, especially across different channels, implementing sharding strategies to distribute the data across multiple MongoDB instances could be beneficial.
 
