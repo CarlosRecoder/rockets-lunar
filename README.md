@@ -71,6 +71,30 @@ The project includes a CI pipeline configured using GitHub Actions. This pipelin
 
 Given the 6-hour limit for the challenge, the focus was on implementing a simple and functional pipeline that could handle the key requirements. The decision to use Python was due to its readability and robust support for working with JSON and HTTP requests. Kafka was chosen for its capabilities in handling real-time, distributed message streams, and MongoDB for its ease of use with JSON-like documents.
 
+### Handling Message Order and Duplicates
+
+The Rocket Data Pipeline is designed to handle the complexities of streaming data such as out-of-order messages and message duplication (at-least-once guarantee). These are key aspects to ensure reliable data processing, especially for time-based event data.
+
+1. **At-Least-Once Delivery and Duplicates Handling:**
+The pipeline already perfectly handles the at-least-once guarantee and potential message duplication issues. The combination of Kafka and MongoDB is key to achieving this:
+
+- **Kafka** is used as the message broker. Kafka provides built-in support for message offsets. An offset is a unique identifier assigned to each message in Kafka, and consumers use these offsets to keep track of the messages they have consumed. In this case, the consumer commits the offset of each message to Kafka after processing it, providing a robust mechanism to ensure that each message is processed at least once.
+
+- **MongoDB** is used as the database to store the rocket messages. Before inserting a new message into the database, a check is made to see if a message with the same number already exists in the corresponding channel. If such a message exists, it is considered as a duplicate and skipped, ensuring that the database does not store duplicate messages.
+
+
+2. **Out-of-Order Messages Handling:**
+
+The pipeline doesn't explicitly handle the out-of-order issue due to the complexity that it would introduce to the system. After extensive testing, it was noticed that the messages, while possibly arriving out of order to the system, were never out of order within their own channels. Given this observation and the constraints on time and resources, the pragmatic decision to not add additional logic to handle out-of-order messages was made.
+
+That said, specific mechanisms to handle out-of-order messages could be introduced if necessary:
+
+- **Buffering:** Using a buffer would be the first and most straightforward approach to deal with out-of-order messages in this scenario. In this strategy, messages are temporarily stored as they arrive, rather than being immediately processed. Each message is associated with a unique `MessageNumber` per channel, and this number is used to determine the correct sequence of messages.
+
+The buffer operates based on a defined 'maximum `MessageNumber`'. When a message arrives, its message number is checked against this maximum. If the arriving message's number is higher than the current maximum, the system recognizes that one or more preceding messages are yet to arrive. Consequently, this message is held in the buffer until all of its predecessors have been received and processed. Once the missing messages arrive and their processing is completed in their correct order, the buffered message (with the higher number) would be released from the buffer and processed. This ensures that all messages are processed in the correct sequence, even if they arrive out of order.
+
+- **Windowing and Watermarking:** A more sophisticated approach would be to use windowing and watermarking. Windowing is a technique where the incoming messages are divided into discrete time windows and the messages within each window are processed separately. This allows for handling out-of-order messages by delaying the processing of each window until all or most of the messages for that window have been received.
+
 ### Scalability
 
 The system has been designed keeping scalability in mind. Kafka and MongoDB, the key components of the system, are known for their scalability. Kafka can handle high volume real-time data feeds through its distributed nature, and MongoDB supports horizontal scaling through sharding. However, as the scale of the system grows, there may be areas that need additional consideration:
