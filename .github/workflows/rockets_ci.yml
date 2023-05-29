@@ -1,4 +1,4 @@
-name: Rockets CI/CD
+name: Rockets Lunar CI
 
 on:
   push:
@@ -30,4 +30,4 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m pytest
+        python3 -m pytest
