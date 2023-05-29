@@ -26,9 +26,9 @@ class RocketsConsumer:
         logger.addHandler(handler)
         return logger
 
-    def initialize_kafka_consumer(self, kafka_consumer = None):
+    def initialize_kafka_consumer(self, kafka_consumer=None):
         # Consumer for main app
-        if kafka_consumer == None:
+        if kafka_consumer is None:
             kafka_bootstrap_servers = 'kafka:9092'
             kafka_topic = 'rocket_messages'
             consumer_group_id = 'mongo_consumer'
@@ -45,10 +45,10 @@ class RocketsConsumer:
         else:
             return kafka_consumer
 
-    def initialize_mongo_client(self, mongo_client = None):
+    def initialize_mongo_client(self, mongo_client=None):
         mongodb_database = 'rocket_data'
         # MongoDB for main app
-        if mongo_client == None:
+        if mongo_client is None:
             mongodb_uri = 'mongodb://mongodb:27017'
             try:
                 mongo_client = MongoClient(mongodb_uri)
