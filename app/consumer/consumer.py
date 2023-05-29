@@ -40,7 +40,7 @@ except PyMongoError:
 db = mongo_client[mongodb_database]
 
 # Data processing and storage logic
-for message in consumer:
+def process_message(message):
 
     try:
         # Decode the message value
@@ -51,7 +51,7 @@ for message in consumer:
 
     except (UnicodeDecodeError, ValueError) as e:
         logger.exception('Error decoding or deserializing message:')
-        continue
+        return
     
     try:
         # Extract the necessary information from the rocket message
@@ -77,7 +77,7 @@ for message in consumer:
         if existing_message:
             # Skip the duplicate message
             logger.info(f"Duplicate message {message_number} on channel {channel} skipped")
-            continue
+            return
 
         # Construct the message document
         message_doc = {
@@ -104,3 +104,7 @@ for message in consumer:
 
     except KafkaError:
         logger.exception('Kafka operation failed:')
+
+# Consume messages
+for message in consumer:
+    process_message(message)
