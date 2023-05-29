@@ -2,4 +2,3 @@ fastapi
 pydantic
 kafka-python
 uvicorn
-pymongo

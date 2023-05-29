@@ -1,0 +1,46 @@
+version: "3.1"
+
+services:
+  kafka:
+    image: docker.io/bitnami/kafka:3.4
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+  
+  mongodb:
+    image: mongo
+    restart: always
+  
+  mongo-express:
+    image: mongo-express
+    ports:
+      - '8081:8081'
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      - mongodb
+
+  producer:
+    build:
+      context: ./app/producer
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8088:8088"
+    depends_on:
+      - kafka
+
+  consumer:
+    build:
+      context: ./app/consumer
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - kafka
+      - mongodb
+
+  
+
