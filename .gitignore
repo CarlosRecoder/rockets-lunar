@@ -2,3 +2,4 @@
 rockets
 rockets2
 .DS_Store
+.pytest_cache

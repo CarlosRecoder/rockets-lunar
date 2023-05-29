@@ -11,11 +11,16 @@ def test_receive_message():
         'metadata': {'key': 'value'},
         'message': {'content': 'This is a test message'}
     }
+
+    class MockFuture:
+        def get(self, timeout=None):
+            return MockRecordMetadata()
+
+    class MockRecordMetadata:
+        topic = 'test_topic'
     
     # Use patch to replace KafkaProducer.send with a Mock object
-    with patch('kafka.KafkaProducer.send') as mock_send:
-        # Define the behavior of the Mock object
-        mock_send.return_value.get.return_value = True
+    with patch('kafka.KafkaProducer.send', return_value=MockFuture()) as mock_send:
         
         # Make a POST request to the /messages endpoint with the test message
         response = client.post('/messages', json=test_message)
@@ -27,4 +32,4 @@ def test_receive_message():
     assert response.status_code == 200
 
     # Assert that the response content is as expected
-    assert response.content.decode('utf-8') == 'Message received and published to Kafka'
+    assert response.json() == 'Message received and published to Kafka'
